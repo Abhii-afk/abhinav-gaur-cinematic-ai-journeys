@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionTemplate, useScroll, useTransform } from "framer-motion";
 
 const links = [
   { to: "/", label: "Index" },
@@ -11,19 +11,29 @@ const links = [
 
 export function Nav() {
   const { scrollY } = useScroll();
-  const blur = useTransform(scrollY, [0, 120], [0, 18]);
+  const blurPx = useTransform(scrollY, [0, 120], [0, 18]);
+  const backdrop = useMotionTemplate`blur(${blurPx}px) saturate(140%)`;
   const bg = useTransform(
     scrollY,
     [0, 120],
-    ["oklch(0.16 0.005 260 / 0)", "oklch(0.16 0.005 260 / 0.65)"],
+    ["oklch(0.16 0.005 260 / 0)", "oklch(0.16 0.005 260 / 0.7)"],
   );
+  const borderOpacity = useTransform(scrollY, [0, 120], [0, 1]);
   const location = useLocation();
 
   return (
     <motion.header
-      style={{ backdropFilter: blur.get() ? `blur(${blur.get()}px)` : "none", backgroundColor: bg }}
-      className="fixed inset-x-0 top-0 z-50 border-b border-hairline/0 transition-colors"
+      style={{
+        backdropFilter: backdrop,
+        WebkitBackdropFilter: backdrop,
+        backgroundColor: bg,
+      }}
+      className="fixed inset-x-0 top-0 z-50"
     >
+      <motion.div
+        style={{ opacity: borderOpacity }}
+        className="absolute inset-x-0 bottom-0 h-px bg-hairline"
+      />
       <div className="container-edge mx-auto flex h-16 max-w-7xl items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <span className="font-mono text-xs tracking-[0.3em] text-muted-foreground">
